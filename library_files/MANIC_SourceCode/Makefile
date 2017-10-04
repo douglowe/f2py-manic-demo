@@ -1,0 +1,154 @@
+
+## choose compiler to use
+#COMPILER = NAGF95
+COMPILER = GNUFOR
+
+
+## Compiler command & options
+FC_NAGF95   = nagfor
+FOPT_NAGF95 = -O0 -w=all -f90 -gline -C=all
+FEXT_NAGF95 = -fpp -DNAGF95
+
+FC_GNUFOR   = gfortran-mp-4.9
+FOPT_GNUFOR = -O0
+FEXT_GNUFOR = 
+
+# select commands & options based on compiler
+FC   = $(FC_$(COMPILER))
+FOPT = $(FOPT_$(COMPILER))
+FEXT = $(FEXT_$(COMPILER))
+
+# define which libraries to use
+LIBS =
+#LIBS = -llapack -lblas
+
+
+# group modules
+
+GENSRC = MAP_Precision.f90  \
+	 MAP_Parameters.f90     \
+	 MAP_Global.f90         \
+	 Physical_Parameters.f90
+GENOBJ = MAP_Precision.o    \
+	 MAP_Parameters.o       \
+	 MAP_Global.o           \
+	 Physical_Parameters.o
+
+FUNSRC = MAP_Function.f90 
+FUNOBJ = MAP_Function.o 
+
+JACSRC = MAP_JacobianSP.f90  MAP_Jacobian.f90
+JACOBJ = MAP_JacobianSP.o    MAP_Jacobian.o
+
+UTLSRC = MAP_Rates.f90 MAP_Util.f90 MAP_Monitor.f90
+UTLOBJ = MAP_Rates.o   MAP_Util.o   MAP_Monitor.o
+
+LASRC  = MAP_LinearAlgebra.f90 
+LAOBJ  = MAP_LinearAlgebra.o   
+
+AEROSRC = aerosol_microphysics.f90 aerosol_thermodynamics.f90 density.f90
+AEROOBJ = aerosol_microphysics.o aerosol_thermodynamics.o density.o
+
+NUMSRC = Moving_Centre_Function.f90
+NUMOBJ = Moving_Centre_Function.o
+
+MAINSRC = Driver.f90 \
+  	MAP_Initialize.f90 \
+	MAP_Integrator.f90 \
+	MAP_Model.f90
+MAINOBJ = Driver.o \
+	MAP_Initialize.o \
+	MAP_Integrator.o \
+	MAP_Model.o 
+	
+INSRC = input.F90
+INOBJ = input.o
+
+ALLOBJ = $(GENOBJ) $(FUNOBJ) $(JACOBJ) $(UTLOBJ) $(LAOBJ) $(AEROOBJ) $(NUMOBJ) $(INOBJ)
+
+
+# executables
+
+all:    exe
+
+exe:	$(ALLOBJ) $(MAINOBJ) 
+	$(FC) $(FOPT) $(ALLOBJ) $(MAINOBJ) $(LIBS) -o MAP.exe
+
+clean:
+	rm -f *.o *.mod \
+	*.exe *.mexglx \
+	*.map
+
+distclean:
+	rm -f *.o *.mod \
+	*.dat *.exe *.map \
+	*.f90 *.mexglx
+
+MAP_Precision.o: MAP_Precision.f90 
+	$(FC) $(FOPT) -c $<
+
+MAP_Parameters.o: MAP_Parameters.f90 \
+	            MAP_Precision.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Monitor.o: MAP_Monitor.f90 \
+	             MAP_Precision.o
+	$(FC) $(FOPT) -c $<
+
+Physical_Parameters.o: Physical_parameters.f90 \
+				MAP_Precision.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Global.o: MAP_Global.f90 \
+	            MAP_Parameters.o MAP_Precision.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Initialize.o: MAP_Initialize.f90  $(GENOBJ) $(INOBJ)
+	$(FC) $(FOPT) -c $<
+
+MAP_Function.o: MAP_Function.f90  $(GENOBJ) 
+	$(FC) $(FOPT) -c $<
+
+MAP_JacobianSP.o: MAP_JacobianSP.f90 $(GENOBJ)
+	$(FC) $(FOPT) -c $<
+
+MAP_Jacobian.o: MAP_Jacobian.f90  $(GENOBJ) MAP_JacobianSP.o
+	$(FC) $(FOPT) -c $<
+
+MAP_LinearAlgebra.o: MAP_LinearAlgebra.f90 $(GENOBJ) MAP_JacobianSP.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Rates.o: MAP_Rates.f90  $(GENOBJ) $(AEROOBJ) MAP_Util.o \
+				MAP_Monitor.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Util.o: MAP_Util.f90  $(GENOBJ) MAP_Monitor.o
+	$(FC) $(FOPT) -c $<
+
+Driver.o: Driver.f90  $(ALLOBJ) MAP_Initialize.o MAP_Model.o \
+				MAP_Integrator.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Model.o: MAP_Model.f90  $(ALLOBJ) MAP_Integrator.o
+	$(FC) $(FOPT) -c $<
+
+MAP_Integrator.o: MAP_Integrator.f90  $(ALLOBJ)
+	$(FC) $(FOPT) -c $<
+
+aerosol_thermodynamics.o: aerosol_thermodynamics.f90 $(GENOBJ)
+	$(FC) $(FOPT) -c $<
+	
+density.o: density.f90
+	$(FC) $(FOPT) -c $<
+
+aerosol_microphysics.o: aerosol_microphysics.f90 $(GENOBJ) \
+				aerosol_thermodynamics.o MAP_Util.o MAP_Monitor.o \
+				density.o
+	$(FC) $(FOPT) -c $<
+
+Moving_Centre_Function.o: Moving_Centre_Function.f90 $(GENOBJ) $(UTLOBJ) \
+				$(AEROOBJ) 
+	$(FC) $(FOPT) -c $<
+
+input.o: input.F90
+	$(FC) $(FEXT) $(FOPT) -c $<
