@@ -3,6 +3,11 @@
 #COMPILER = NAGF95
 COMPILER = GNUFOR
 
+# Archive Command (needed to create .a file)
+ARC = ar
+
+# Flags for Archive command
+ARCFLAG = -r -s
 
 ## Compiler command & options
 FC_NAGF95   = nagfor
@@ -10,7 +15,7 @@ FOPT_NAGF95 = -O0 -w=all -f90 -gline -C=all
 FEXT_NAGF95 = -fpp -DNAGF95
 
 FC_GNUFOR   = gfortran-mp-4.9
-FOPT_GNUFOR = -O0
+FOPT_GNUFOR = -O0 -ffpe-trap=invalid,zero,overflow,underflow,inexact,denormal -g -static
 FEXT_GNUFOR = 
 
 # select commands & options based on compiler
@@ -21,6 +26,7 @@ FEXT = $(FEXT_$(COMPILER))
 # define which libraries to use
 LIBS =
 #LIBS = -llapack -lblas
+LOCLIBS = -L./ -lmapmanic -I./modules
 
 
 # group modules
@@ -66,23 +72,57 @@ INOBJ = input.o
 
 ALLOBJ = $(GENOBJ) $(FUNOBJ) $(JACOBJ) $(UTLOBJ) $(LAOBJ) $(AEROOBJ) $(NUMOBJ) $(INOBJ)
 
+LIBOBJ = $(ALLOBJ) MAP_Integrator.o MAP_Model.o
 
-# executables
+LIB = libmapmanic.a
 
+
+
+# aims
+
+.PHONY : all
 all:    exe
 
-exe:	$(ALLOBJ) $(MAINOBJ) 
-	$(FC) $(FOPT) $(ALLOBJ) $(MAINOBJ) $(LIBS) -o MAP.exe
+.PHONY : exe
+exe:	$(LIB) Driver.o MAP_Initialize.o 
+	$(FC) $(FOPT) Driver.o MAP_Initialize.o $(LOCLIBS) $(LIBS) -o MAP.exe
 
+.PHONY : clean
 clean:
 	rm -f *.o *.mod \
 	*.exe *.mexglx \
 	*.map
 
+.PHONY : distclean
 distclean:
 	rm -f *.o *.mod \
 	*.dat *.exe *.map \
 	*.f90 *.mexglx
+
+
+# instruction for building library file
+
+.PHONY : lib
+lib: $(LIB)
+
+$(LIB): $(LIBOBJ)
+	$(ARC) $(ARCFLAG) $(LIB) $(LIBOBJ)
+	mkdir modules
+	mv *mod modules/
+	#rm *o
+
+
+
+
+# executables
+
+MAP_Initialize.o: MAP_Initialize.f90 $(LIB)
+	$(FC) $(FOPT) $(LOCLIBS) -c $<
+
+Driver.o: Driver.f90  $(LIB) MAP_Initialize.o
+	$(FC) $(FOPT) $(LOCLIBS) -c $<
+
+
 
 MAP_Precision.o: MAP_Precision.f90 
 	$(FC) $(FOPT) -c $<
@@ -101,9 +141,6 @@ Physical_Parameters.o: Physical_parameters.f90 \
 
 MAP_Global.o: MAP_Global.f90 \
 	            MAP_Parameters.o MAP_Precision.o
-	$(FC) $(FOPT) -c $<
-
-MAP_Initialize.o: MAP_Initialize.f90  $(GENOBJ) $(INOBJ)
 	$(FC) $(FOPT) -c $<
 
 MAP_Function.o: MAP_Function.f90  $(GENOBJ) 
@@ -125,9 +162,6 @@ MAP_Rates.o: MAP_Rates.f90  $(GENOBJ) $(AEROOBJ) MAP_Util.o \
 MAP_Util.o: MAP_Util.f90  $(GENOBJ) MAP_Monitor.o
 	$(FC) $(FOPT) -c $<
 
-Driver.o: Driver.f90  $(ALLOBJ) MAP_Initialize.o MAP_Model.o \
-				MAP_Integrator.o
-	$(FC) $(FOPT) -c $<
 
 MAP_Model.o: MAP_Model.f90  $(ALLOBJ) MAP_Integrator.o
 	$(FC) $(FOPT) -c $<
