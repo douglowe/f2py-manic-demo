@@ -1,19 +1,10 @@
-## Makefile for constructing both MAP MANIC 
-## aerosol model, and a library file for 
-## the python module.  
+## Original Makefile for MAP MANIC aerosol model. 
 ## Options available are:
-
-
 
 # choose compiler to use
 #COMPILER = NAGF95
 COMPILER = GNUFOR
 
-# Archive Command (needed to create .a file)
-ARC = ar
-
-# Flags for Archive command
-ARCFLAG = -r -s
 
 # Compiler command & options
 FC_NAGF95   = nagfor
@@ -34,7 +25,6 @@ FEXT = $(FEXT_$(COMPILER))
 # define which libraries to use
 LIBS =
 #LIBS = -llapack -lblas
-LOCLIBS = -L./ -lmapmanic -I./modules
 
 
 # group modules
@@ -80,78 +70,32 @@ INOBJ = input.o
 
 ALLOBJ = $(GENOBJ) $(FUNOBJ) $(JACOBJ) $(UTLOBJ) $(LAOBJ) $(AEROOBJ) $(NUMOBJ) $(INOBJ)
 
-LIBOBJ = $(ALLOBJ) MAP_Integrator.o MAP_Model.o
 
-LIB = libmapmanic.a
+# executables
 
-
-
-# aims
-
-## all : compile program with standard options 
-##       (creating the library in the process)
+## all : compile program with standard options
 .PHONY : all
 all:    exe
 
 ## debug : compile program with debugging flags
-##       (creating the library in the process)
 .PHONY : debug
 debug: 	FOPT = $(FOPT_DEBUG_$(COMPILER))
 debug:  exe	
 
-## exe : compile program with standard options
-.PHONY : exe
-exe:	$(LIB) Driver.o MAP_Initialize.o 
-	$(FC) $(FOPT) Driver.o MAP_Initialize.o $(LOCLIBS) $(LIBS) -o MAP.exe
-
-
 ## help : this help message
 .PHONY : help
-help : Makefile
+help : Makefile_Original
 	@sed -n 's/^##//p' $<
 
+## exe : compile program with standard options
+exe:	$(ALLOBJ) $(MAINOBJ) 
+	$(FC) $(FOPT) $(ALLOBJ) $(MAINOBJ) $(LIBS) -o MAP.exe
 
 ## clean : remove executables and module files
-.PHONY : clean
+.PHONY: clean
 clean:
 	rm -f *.o *.mod \
 	*.exe
-
-
-# instruction for building library file
-
-## lib : compile library with standard options
-.PHONY : lib
-lib: $(LIB)
-
-## debug_lib : compile library with debug options
-.PHONY : lib
-debug_lib : FOPT = $(FOPT_DEBUG_$(COMPILER))
-debug_lib: $(LIB)
-
-
-$(LIB): $(LIBOBJ)
-	$(ARC) $(ARCFLAG) $(LIB) $(LIBOBJ)
-	mkdir modules
-	mv *mod modules/
-
-## lib_clean : remove executables, module files and library files
-.PHONY : lib_clean
-lib_clean:
-	rm -f *.o *.mod *.exe *.a
-	rm -rf modules
-
-
-
-
-# executables
-
-MAP_Initialize.o: MAP_Initialize.f90 $(LIB)
-	$(FC) $(FOPT) $(LOCLIBS) -c $<
-
-Driver.o: Driver.f90  $(LIB) MAP_Initialize.o
-	$(FC) $(FOPT) $(LOCLIBS) -c $<
-
 
 
 MAP_Precision.o: MAP_Precision.f90 
@@ -173,6 +117,9 @@ MAP_Global.o: MAP_Global.f90 \
 	            MAP_Parameters.o MAP_Precision.o
 	$(FC) $(FOPT) -c $<
 
+MAP_Initialize.o: MAP_Initialize.f90  $(GENOBJ) $(INOBJ)
+	$(FC) $(FOPT) -c $<
+
 MAP_Function.o: MAP_Function.f90  $(GENOBJ) 
 	$(FC) $(FOPT) -c $<
 
@@ -192,6 +139,9 @@ MAP_Rates.o: MAP_Rates.f90  $(GENOBJ) $(AEROOBJ) MAP_Util.o \
 MAP_Util.o: MAP_Util.f90  $(GENOBJ) MAP_Monitor.o
 	$(FC) $(FOPT) -c $<
 
+Driver.o: Driver.f90  $(ALLOBJ) MAP_Initialize.o MAP_Model.o \
+				MAP_Integrator.o
+	$(FC) $(FOPT) -c $<
 
 MAP_Model.o: MAP_Model.f90  $(ALLOBJ) MAP_Integrator.o
 	$(FC) $(FOPT) -c $<
