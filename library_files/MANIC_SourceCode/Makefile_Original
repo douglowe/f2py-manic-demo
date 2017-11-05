@@ -53,8 +53,8 @@ LAOBJ  = MAP_LinearAlgebra.o
 AEROSRC = aerosol_microphysics.f90 aerosol_thermodynamics.f90 density.f90
 AEROOBJ = aerosol_microphysics.o aerosol_thermodynamics.o density.o
 
-NUMSRC = Moving_Centre_Function.f90
-NUMOBJ = Moving_Centre_Function.o
+NUMSRC = Model_Routines.f90
+NUMOBJ = Model_Routines.o
 
 MAINSRC = Driver.f90 \
   	MAP_Initialize.f90 \
@@ -160,7 +160,7 @@ aerosol_microphysics.o: aerosol_microphysics.f90 $(GENOBJ) \
 				density.o
 	$(FC) $(FOPT) -c $<
 
-Moving_Centre_Function.o: Moving_Centre_Function.f90 $(GENOBJ) $(UTLOBJ) \
+Model_Routines.o: Model_Routines.f90 $(GENOBJ) $(UTLOBJ) \
 				$(AEROOBJ) 
 	$(FC) $(FOPT) -c $<
 

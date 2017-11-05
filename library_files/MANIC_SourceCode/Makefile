@@ -63,8 +63,8 @@ LAOBJ  = MAP_LinearAlgebra.o
 AEROSRC = aerosol_microphysics.f90 aerosol_thermodynamics.f90 density.f90
 AEROOBJ = aerosol_microphysics.o aerosol_thermodynamics.o density.o
 
-NUMSRC = Moving_Centre_Function.f90
-NUMOBJ = Moving_Centre_Function.o
+NUMSRC = Model_Routines.f90
+NUMOBJ = Model_Routines.o
 
 MAINSRC = Driver.f90 \
   	MAP_Initialize.f90 \
@@ -78,9 +78,11 @@ MAINOBJ = Driver.o \
 INSRC = input.F90
 INOBJ = input.o
 
-ALLOBJ = $(GENOBJ) $(FUNOBJ) $(JACOBJ) $(UTLOBJ) $(LAOBJ) $(AEROOBJ) $(NUMOBJ) $(INOBJ)
+MODOBJ = $(GENOBJ) $(FUNOBJ) $(JACOBJ) $(UTLOBJ) $(LAOBJ) $(AEROOBJ) $(NUMOBJ)
 
-LIBOBJ = $(ALLOBJ) MAP_Integrator.o MAP_Model.o
+ALLOBJ = $(MODOBJ) $(INOBJ)
+
+LIBOBJ = $(MODOBJ) MAP_Integrator.o MAP_Model.o
 
 LIB = libmapmanic.a
 
@@ -101,8 +103,8 @@ debug:  exe
 
 ## exe : compile program with standard options
 .PHONY : exe
-exe:	$(LIB) Driver.o MAP_Initialize.o 
-	$(FC) $(FOPT) Driver.o MAP_Initialize.o $(LOCLIBS) $(LIBS) -o MAP.exe
+exe:	$(LIB) Driver.o MAP_Initialize.o $(INOBJ)
+	$(FC) $(FOPT) Driver.o MAP_Initialize.o $(INOBJ) $(LOCLIBS) $(LIBS) -o MAP.exe
 
 
 ## help : this help message
@@ -125,7 +127,7 @@ clean:
 lib: $(LIB)
 
 ## debug_lib : compile library with debug options
-.PHONY : lib
+.PHONY : debug_lib
 debug_lib : FOPT = $(FOPT_DEBUG_$(COMPILER))
 debug_lib: $(LIB)
 
@@ -146,10 +148,10 @@ lib_clean:
 
 # executables
 
-MAP_Initialize.o: MAP_Initialize.f90 $(LIB)
+MAP_Initialize.o: MAP_Initialize.f90 $(LIB) $(INOBJ)
 	$(FC) $(FOPT) $(LOCLIBS) -c $<
 
-Driver.o: Driver.f90  $(LIB) MAP_Initialize.o
+Driver.o: Driver.f90  $(LIB) $(INOBJ) MAP_Initialize.o
 	$(FC) $(FOPT) $(LOCLIBS) -c $<
 
 
@@ -193,10 +195,10 @@ MAP_Util.o: MAP_Util.f90  $(GENOBJ) MAP_Monitor.o
 	$(FC) $(FOPT) -c $<
 
 
-MAP_Model.o: MAP_Model.f90  $(ALLOBJ) MAP_Integrator.o
+MAP_Model.o: MAP_Model.f90  $(MODOBJ) MAP_Integrator.o
 	$(FC) $(FOPT) -c $<
 
-MAP_Integrator.o: MAP_Integrator.f90  $(ALLOBJ)
+MAP_Integrator.o: MAP_Integrator.f90  $(MODOBJ)
 	$(FC) $(FOPT) -c $<
 
 aerosol_thermodynamics.o: aerosol_thermodynamics.f90 $(GENOBJ)
@@ -210,7 +212,7 @@ aerosol_microphysics.o: aerosol_microphysics.f90 $(GENOBJ) \
 				density.o
 	$(FC) $(FOPT) -c $<
 
-Moving_Centre_Function.o: Moving_Centre_Function.f90 $(GENOBJ) $(UTLOBJ) \
+Model_Routines.o: Model_Routines.f90 $(GENOBJ) $(UTLOBJ) \
 				$(AEROOBJ) 
 	$(FC) $(FOPT) -c $<
 
