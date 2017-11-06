@@ -113,6 +113,8 @@ MODULE MAP_Monitor
   CHARACTER(LEN=20), PARAMETER, DIMENSION(246) :: SPC_NAMES = (/&
     SPC_NAMES_0, SPC_NAMES_1, SPC_NAMES_2 /)
 
+!f2py character*20 :: spc_names(246)
+
   INTEGER, PARAMETER, DIMENSION(246) :: LOOKAT = (/ &
        1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, &
       13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, &
