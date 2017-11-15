@@ -29,7 +29,7 @@ LOCLIBS = -L$(LIBPATH) -lmapmanic -I$(LIBPATH)modules/
 
 # commands for f2py
 FP = f2py-2.7
-FPOPT = --f90exec=gfortran-mp-4.9 -c -m
+FPOPT = --f90exec=$(FC) -c -m
 FPLIB = $(LIBPATH)libmapmanic.a -I$(LIBPATH)modules/
 
 

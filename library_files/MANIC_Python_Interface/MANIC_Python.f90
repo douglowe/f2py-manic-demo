@@ -7,8 +7,8 @@ subroutine manic_python(N_P_SPEC, C_P, CNP_P, CFACTOR_P, &
 						tstart_P, tend_P, tout_P, start_P )
 
 !f2py integer, intent(in) :: N_P_SPEC
-!f2py real(kind=dp_alt), intent(in, out), depend(NP_SPEC) :: C_P(N_P_SPEC)
-!f2py real(kind=dp_alt), intent(in, out), depend(NP_SPEC) :: CNP_P(N_P_SPEC)
+!f2py real(kind=dp_alt), intent(in, out), depend(N_P_SPEC) :: C_P(N_P_SPEC)
+!f2py real(kind=dp_alt), intent(in, out), depend(N_P_SPEC) :: CNP_P(N_P_SPEC)
 !f2py real(kind=dp_alt), intent(in) :: CFACTOR_P
 !f2py integer, intent(in) :: traj_length_P
 !f2py real(kind=dp_alt), intent(in), depend(traj_length_P) :: time_traj_P(traj_length_P)
@@ -137,6 +137,8 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 
 	istatus = 0
 
+		write(6,*) ' edges of bin 1, array 1     edges of bin 1, array 2  '
+		write(6,'(4e12.4)') UEDGE_P(1,1), UEDGE_P(1,2), UEDGE_P(2,1), UEDGE_P(2,2)
 
 		write(6,*) '  radii1      number1      radii2        number2'
 	  	do i=1,m
