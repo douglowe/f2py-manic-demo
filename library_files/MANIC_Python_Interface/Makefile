@@ -11,9 +11,10 @@ FC_NAGF95   = nagfor
 FOPT_NAGF95 = -O0 -w=all -f90 -gline -C=all
 FEXT_NAGF95 = -fpp -DNAGF95
 
-FC_GNUFOR   = gfortran-mp-4.9
-FOPT_NAGF95 = -O3
-FOPT_DEBUG_NAGF95 = -O0 -w=all -f90 -gline -C=all
+#FC_GNUFOR   = gfortran-mp-4.9
+FC_GNUFOR   = gfortran
+FOPT_GNUFOR = -O3
+FOPT_DEBUG_GNUFOR = -O0 -fPIC -ffpe-trap=invalid,zero,overflow -g
 FEXT_GNUFOR = 
 
 # select commands & options based on compiler
@@ -28,8 +29,9 @@ LIBPATH = ../MANIC_SourceCode/
 LOCLIBS = -L$(LIBPATH) -lmapmanic -I$(LIBPATH)modules/
 
 # commands for f2py
-FP = f2py-2.7
-FPOPT = --f90exec=$(FC) -c -m
+#FP = f2py-2.7
+FP = f2py
+FPOPT = -c --fcompiler=$(FC) --f90exec=$(FC) --f90flags='$(FOPT_DEBUG_$(COMPILER))' --arch='$(FOPT_DEBUG_$(COMPILER))' --opt='$(FOPT_DEBUG_$(COMPILER))' --debug -m
 FPLIB = $(LIBPATH)libmapmanic.a -I$(LIBPATH)modules/
 
 
