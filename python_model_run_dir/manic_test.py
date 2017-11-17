@@ -103,7 +103,7 @@ traj_length_p = len(time_traj_p)
 # trajectory information
 dt_p = 3600.0
 tstepmax_p = 300.0
-pdfite_p = 1   # this will become logical within manic?
+pdfite_p = 0   # this will become logical within manic?
 
 tstart_p = 0.0
 tend_p   = time_traj_p[traj_length_p-1]

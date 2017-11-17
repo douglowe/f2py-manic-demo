@@ -37,7 +37,7 @@ subroutine manic_python(N_P_SPEC, C_P, CNP_P, CFACTOR_P, &
 
 	use MAP_Model
 	use MAP_Python_Initialize
-!	use model_routines
+	use model_routines
 	use physical_parameters
 	implicit none
 
@@ -101,7 +101,7 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 
 	! set tolerances
 	do i = 1,nvar
-	  rtol(i) = 1.0d-6
+	  rtol(i) = 1.0d-3
 	  atol(i) = 1.0d-21
 	end do ! i=1,nc
 	rcntrl = 0d0
@@ -133,6 +133,9 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 	end if
 
 
+	call output 
+
+
 	rstate(3) = 1d-5   ! initial timestep, this will be set by solver later
 	cou = 0            ! counter for timesteps taken
 
@@ -159,13 +162,14 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 			icntrl_u = (/ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /) )
 		Ntotal = Ntotal + ISTATUS(3)
 
-		write(6,*) 'timestep ', cou, ' was ', RSTATE(1)
+		!write(6,*) 'timestep ', cou, ' was ', RSTATE(1)
 
 		! calculate time of next step
 		if((RSTATE(1)-time).eq.0d0) write(6,*) 'timestep zero!'
 		time = time + RSTATE(1)
 
 		if(time.ge.tout) then
+			call output 
 			tout = time + dt
 
 			write(6,'(i6,e12.4)') cou, RSTATE(1)
