@@ -105,8 +105,8 @@ dt_p = 3600.0
 tstepmax_p = 300.0
 pdfite_p = 1   # this will become logical within manic?
 
-tstart_p = 3600.0
-tend_p   = tstart_p + dt_p
+tstart_p = 0.0
+tend_p   = time_traj_p[traj_length_p-1]
 
 # flag to say that we're in the first step (so calculate the water, H+, OH-, content for aerosol)
 start_p = 1

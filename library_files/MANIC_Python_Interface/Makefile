@@ -31,7 +31,7 @@ LOCLIBS = -L$(LIBPATH) -lmapmanic -I$(LIBPATH)modules/
 # commands for f2py
 #FP = f2py-2.7
 FP = f2py
-FPOPT = -c --fcompiler=$(FC) --f90exec=$(FC) --f90flags='$(FOPT_DEBUG_$(COMPILER))' --arch='$(FOPT_DEBUG_$(COMPILER))' --opt='$(FOPT_DEBUG_$(COMPILER))' --debug -m
+FPOPT = -c --f90exec=$(FC) --f90flags='$(FOPT_DEBUG_$(COMPILER))' --debug -m
 FPLIB = $(LIBPATH)libmapmanic.a -I$(LIBPATH)modules/
 
 

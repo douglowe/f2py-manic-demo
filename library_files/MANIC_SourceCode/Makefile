@@ -23,7 +23,7 @@ FEXT_NAGF95 = -fpp -DNAGF95
 
 FC_GNUFOR   = gfortran-mp-4.9
 FOPT_GNUFOR = -O3
-FOPT_DEBUG_GNUFOR = -O0 -ffpe-trap=invalid,zero,overflow -g
+FOPT_DEBUG_GNUFOR = -O0 -fPIC -ffpe-trap=invalid,zero,overflow -g
 FEXT_GNUFOR = 
 
 # select commands & options based on compiler
@@ -167,7 +167,7 @@ MAP_Monitor.o: MAP_Monitor.f90 \
 	             MAP_Precision.o
 	$(FC) $(FOPT) -c $<
 
-Physical_Parameters.o: Physical_parameters.f90 \
+Physical_Parameters.o: Physical_Parameters.f90 \
 				MAP_Precision.o
 	$(FC) $(FOPT) -c $<
 

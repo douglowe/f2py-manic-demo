@@ -117,6 +117,7 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
     tidal_height = tide_traj(1)
     SUN   = sun_traj(1)
     traj_species = 0
+    traj_length = traj_length_P
 
 
 	! Set up the number array
@@ -137,16 +138,9 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 
 	istatus = 0
 
-		write(6,*) ' edges of bin 1, array 1     edges of bin 1, array 2  '
-		write(6,'(4e12.4)') UEDGE_P(1,1), UEDGE_P(1,2), UEDGE_P(2,1), UEDGE_P(2,2)
 
-		write(6,*) '  radii1      number1      radii2        number2'
-	  	do i=1,m
-		    write(6,'(4e12.4)') radius(i,1), Z(i,1), radius(i,2), Z(i,2)
-	  	end do
-		write(6,*) SPC_NAMES(ind_CH2I2), C(ind_CH2I2)/cfactor !, cnp(15)/cfactor
-		write(6,*) SPC_NAMES(ind_IO), C(ind_IO)/cfactor !, cnp(15)/cfactor
-		write(6,*) time, tout, tend
+	tout = time + dt
+
 
 
 !---> time loop
@@ -171,16 +165,19 @@ INTEGER, PARAMETER :: dp_alt = SELECTED_REAL_KIND(14,300)
 		if((RSTATE(1)-time).eq.0d0) write(6,*) 'timestep zero!'
 		time = time + RSTATE(1)
 
-	  	write(6,'(i6,e12.4)') cou, RSTATE(1)
-		write(6,*) '  radii1      number1      radii2        number2'
-	  	do i=1,m
-		    write(6,'(4e12.4)') radius(i,1), Z(i,1), radius(i,2), Z(i,2)
-	  	end do
-		write(6,*) SPC_NAMES(ind_CH2I2), C(ind_CH2I2)/cfactor !, cnp(15)/cfactor
-		write(6,*) SPC_NAMES(ind_IO), C(ind_IO)/cfactor !, cnp(15)/cfactor
-		write(6,*) time, tout, tend
-    	PRINT*,'NSTEPS=',ISTATUS(3),' (',Ntotal,')   (',cou,')'
+		if(time.ge.tout) then
+			tout = time + dt
 
+			write(6,'(i6,e12.4)') cou, RSTATE(1)
+			write(6,*) '  radii1      number1      radii2        number2'
+			do i=1,m
+				write(6,'(4e12.4)') radius(i,1), Z(i,1), radius(i,2), Z(i,2)
+			end do
+			write(6,*) SPC_NAMES(ind_CH2I2), C(ind_CH2I2)/cfactor !, cnp(15)/cfactor
+			write(6,*) SPC_NAMES(ind_IO), C(ind_IO)/cfactor !, cnp(15)/cfactor
+			write(6,*) time, tout, tend
+			PRINT*,'NSTEPS=',ISTATUS(3),' (',Ntotal,')   (',cou,')'
+		end if
 
 		! exit at end of time
 		if (time >= tend) exit time_loop
