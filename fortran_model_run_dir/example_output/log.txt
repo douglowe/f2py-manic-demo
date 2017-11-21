@@ -8773,6 +8773,7 @@
  IO                     2.0169881077319700E-003
    1209600.0000000000        1213200.0000000000        1209600.0000000000     
  NSTEPS=           1  (       10943 )   (        4037 )
- CPU time taken (seconds) =   42.482948000000000     
+ CPU time taken (seconds) =   5.6642690000000000     
  Average CPU seconds taken
-   per model hour =  0.12643734523809524     
+   per model hour =   1.6857943452380952E-002
+Model Run time was 6 seconds

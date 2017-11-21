@@ -21,7 +21,8 @@ FOPT_NAGF95 = -O3
 FOPT_DEBUG_NAGF95 = -O0 -w=all -f90 -gline -C=all
 FEXT_NAGF95 = -fpp -DNAGF95
 
-FC_GNUFOR   = gfortran-mp-4.9
+#FC_GNUFOR   = gfortran-mp-4.9
+FC_GNUFOR   = gfortran
 FOPT_GNUFOR = -O3
 FOPT_DEBUG_GNUFOR = -O0 -fPIC -ffpe-trap=invalid,zero,overflow -g
 FEXT_GNUFOR = 

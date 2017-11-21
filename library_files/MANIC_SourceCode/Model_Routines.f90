@@ -22,7 +22,7 @@ module model_routines
 	real(kind=dp), dimension(100,m+1,nd) :: psort	
 	real(kind=dp), dimension(100,m+1,nd) :: palt	
 	real(kind=dp), dimension(m+1,nd) :: pHalt, h2o_mass	
-	character(len=20), dimension(100,m+1,nd) :: nsort	
+	character(len=25), dimension(100,m+1,nd) :: nsort	
 	integer, parameter :: ngas = 74
 	integer, parameter :: naero = 80
 	real(kind=dp) :: Ctemp
@@ -266,7 +266,14 @@ module model_routines
 	nsort(80,1+1,2) = SPC_NAMES(ind_BIN001002H2SO4)  	
 	 
 	open(10,file='manic_gas_ppt.dat',status="replace",recl=20480)
-	!write(10,*) 'Time   ', nsort(1:ngas,1,1)
+	write(10,*) 'Time   ', nsort(1:ngas,1,1)
+
+	open(15,file='manic_bin0101_molality.dat',status="replace",recl=20480)
+	write(15,*) 'Time   ', nsort(1:ngas,2,1)
+
+	open(16,file='manic_bin0102_molality.dat',status="replace",recl=20480)
+	write(16,*) 'Time   ', nsort(1:ngas,2,2)
+
 		
 	
 	do in=1,m
@@ -297,8 +304,7 @@ module model_routines
 	end do !in=1,m
 	
 	open(11,file='manic_microphysics.dat',status="replace",recl=20480)
-	!write(11,*) 'Time   ', dry_lab, wet_lab, n_lab,&
-	!	&' Temp   relhum '
+	write(11,*) 'Time   ', dry_lab, wet_lab, n_lab,' Temp   relhum '
 
 	
 
@@ -598,6 +604,8 @@ module model_routines
 
 
     	write(10,'(400e16.6)') time, sngl(psort(1:ngas,1,1)/CFACTOR)
+    	write(15,'(400e16.6)') time, sngl(palt(1:naero,2,1))
+    	write(16,'(400e16.6)') time, sngl(palt(1:naero,2,2))
 		
     	write(11,'(400e16.6)') time, radius, wrad, Z, temp, rh
 
