@@ -111,9 +111,9 @@ tend_p   = time_traj_p[traj_length_p-1]
 # flag to say that we're in the first step (so calculate the water, H+, OH-, content for aerosol)
 start_p = 1
 
-print c_p
+print(c_p)
 
-print 'HNO3 in = ', c_p[MAPP.map_parameters.ind_hno3-1]
+print('HNO3 in = ', c_p[MAPP.map_parameters.ind_hno3-1])
 
 # call the solver, for one step
 (c_p_new, cnp_new, tout_p) = MANICP.manic_python( n_p_spec=n_p_spec, c_p=c_p, cnp_p=cnp_p, cfactor_p=cfactor_p, 
@@ -126,11 +126,11 @@ print 'HNO3 in = ', c_p[MAPP.map_parameters.ind_hno3-1]
 										r_r_p=r_r_p,
 										tstart_p=tstart_p, tend_p=tend_p, start_p=start_p)
 
-print tstart_p, tend_p, tout_p
-print 'HNO3 in? = ', c_p[MAPP.map_parameters.ind_hno3-1]
-print 'HNO3 out = ', c_p_new[MAPP.map_parameters.ind_hno3-1]
+print(tstart_p, tend_p, tout_p)
+print('HNO3 in? = ', c_p[MAPP.map_parameters.ind_hno3-1])
+print('HNO3 out = ', c_p_new[MAPP.map_parameters.ind_hno3-1])
 
-print c_p_new[0:19]
+print(c_p_new[0:19])
 
 
 
